@@ -1,19 +1,42 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../Contexts/AuthProvider';
 
 const Login = () => {
 
+    const { signIn } = useContext(AuthContext);
+    const [loginError, setLoginError] = useState('');
+
     const handleSignin = e => {
+
 
         e.preventDefault();
 
         const form = e.target;
-        const userName = form.userName.value;
-        console.log("🚀 ~ file: Login.js:12 ~ handleSignin ~ userName", userName)
+        const email = form.email.value;
         const password = form.password.value;
-        console.log("🚀 ~ file: Login.js:14 ~ handleSignin ~ password", password)
+
+
+
+        setLoginError('')
+
+        signIn(email, password)
+            .then(result => {
+                const user = result.user;
+                console.log("🚀 ~ file: Login.js ~ line 18 ~ handleLogin ~ user", user)
+
+                toast.success('User Logged in')
+
+            })
+            .catch(err => {
+                console.error(err.message)
+                setLoginError('Enter correct details.')
+            })
 
     }
+
+
 
 
     return (
@@ -26,8 +49,8 @@ const Login = () => {
                 <form onSubmit={handleSignin} action="" className="space-y-12 ng-untouched ng-pristine ng-valid">
                     <div className="space-y-4">
                         <div>
-                            <label htmlFor="userName" className="block mb-2 font-bold">Username</label>
-                            <input type="text" name="userName" id="userName" placeholder="Type your username here" className="w-full px-3 py-2 border rounded-md border-gray-300 bg-gray-50 text-gray-800" required />
+                            <label htmlFor="email" className="block mb-2 font-bold">Email</label>
+                            <input type="email" name="email" id="email" placeholder="Type your email here" className="w-full px-3 py-2 border rounded-md border-gray-300 bg-gray-50 text-gray-800" required />
                         </div>
                         <div>
                             <div className="flex justify-between mb-2">
@@ -37,6 +60,11 @@ const Login = () => {
                         </div>
                     </div>
                     <div className="space-y-2">
+                        {loginError &&
+                            <div>
+                                <button type="button" className="w-full px-8 py-3 font-semibold rounded-md bg-red-500 text-gray-50">{loginError}</button>
+                            </div>
+                        }
                         <div>
                             <button type="submit" className="w-full px-8 py-3 font-semibold rounded-md bg-yellow-500 text-gray-50">Login</button>
                         </div>

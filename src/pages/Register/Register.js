@@ -1,6 +1,12 @@
+import { useContext } from 'react';
+import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../Contexts/AuthProvider';
 
 const Register = () => {
+
+    const { user, createUser, updateUser } = useContext(AuthContext);
+
 
     const handleSignup = e => {
 
@@ -8,15 +14,55 @@ const Register = () => {
 
         const form = e.target;
         const name = form.name.value;
-        console.log("🚀 ~ file: Register.js:11 ~ handleSignup ~ name", name)
         const userName = form.userName.value;
-        console.log("🚀 ~ file: Register.js:13 ~ handleSignup ~ userName", userName)
         const email = form.email.value;
-        console.log("🚀 ~ file: Register.js:15 ~ handleSignup ~ email", email)
         const password = form.password.value;
-        console.log("🚀 ~ file: Register.js:17 ~ handleSignup ~ password", password)
+
+
+        createUser(email, password)
+            .then(result => {
+                const user = result.user;
+                console.log(user);
+                toast.success('User registered Successfully');
+                const userInfo = {
+                    displayName: name
+                }
+                updateUser(userInfo)
+                    .then(() => {
+                        saveUser(name, email, userName);
+                    })
+
+            })
+            .catch(err => {
+                console.error(err.message)
+            })
+            .catch(error => {
+                console.log(error)
+            });
 
     }
+
+    const saveUser = (name, email, userName) => {
+
+        console.log(name, email, userName);
+        // axios.post(`https://resale-treasury-server-site.vercel.app/users`, {
+        //     name: name,
+        //     email: email,
+        //     userName: userName
+        // })
+        //     .then(function (response) {
+        //         console.log(response);
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     });
+
+
+
+    }
+
+
+
 
     return (
         <div>
@@ -47,9 +93,19 @@ const Register = () => {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <div>
-                            <button type="submit" className="w-full px-8 py-3 font-semibold rounded-md bg-yellow-500 text-white">Register</button>
-                        </div>
+                        {
+                            !user?.email ?
+                                <div>
+                                    <button type="submit" className="w-full px-8 py-3 font-semibold rounded-md bg-yellow-500 text-white">Register</button>
+                                </div>
+                                :
+                                <div>
+                                    <Link to=''>
+                                        <button className="w-full px-8 py-3 font-semibold rounded-md bg-green-500 text-white">Congratulations!!! Account created.</button>
+                                    </Link>
+                                </div>
+
+                        }
                         <p className="px-6 text-sm text-center text-gray-600">Already have an account ?
                             <Link to='/signin' className="hover:underline text-sky-600"> Login</Link>.
                         </p>
